@@ -8,7 +8,7 @@ st.set_page_config(page_title="Registros por Publicador", layout="wide")
 st.title("📊 Registros por Publicador y Día")
 
 # Cargar el dataframe (asume que ya lo tienes cargado como 'df')
-# df = pd.read_csv('tu_archivo.csv')  # Descomenta y ajusta según tu caso
+df = pd.read_stata('6_clean_encuesta_apertura_duplicado.dta')  # Descomenta y ajusta según tu caso
 
 # Para este ejemplo, asumimos que el dataframe está disponible como 'df'
 # Asegurarse de que 'date' sea datetime
