@@ -2,17 +2,21 @@ import streamlit as st
 import pandas as pd
 
 # Configuración de la página
-st.set_page_config(page_title="Registros por Publicador", layout="wide")
+st.set_page_config(page_title="Registros por Fecha", layout="wide")
 
 # Título principal
-st.title("📊 Registros por Publicador y Día")
+st.title("📊 Registros por Fecha y Publicador")
+
+# Función para cargar datos
+def load_data(file_path):
+    return pd.read_stata(file_path)
 
 # Intentar cargar el archivo
 try:
     df = load_data('6_clean_encuesta_apertura_duplicados.dta')
     st.success("✅ Archivo cargado exitosamente")
 except FileNotFoundError:
-    st.warning("⚠️ No se encontró el archivo '6_clean_encuesta_apertura_duplicado.dta'")
+    st.warning("⚠️ No se encontró el archivo '6_clean_encuesta_apertura_duplicados.dta'")
     st.info("Por favor, sube el archivo .dta o .csv")
     
     uploaded_file = st.file_uploader(
@@ -48,72 +52,75 @@ if missing_columns:
     st.error(f"Faltan columnas requeridas: {', '.join(missing_columns)}")
     st.stop()
 
-# Obtener lista única de publicadores ordenada
-publicadores = sorted(df['publicador'].unique())
+# Asegurar que date sea datetime
+df['date'] = pd.to_datetime(df['date'])
 
-st.info(f"📊 Total de publicadores: {len(publicadores)} | Total de registros: {len(df)}")
+# Obtener lista única de fechas ordenadas
+fechas = sorted(df['date'].unique())
+fechas_str = [fecha.strftime('%Y-%m-%d') for fecha in fechas]
 
-# Crear pestañas para cada publicador
-tabs = st.tabs(publicadores)
+st.info(f"📅 Total de fechas: {len(fechas)} | Total de publicadores: {df['publicador'].nunique()} | Total de registros: {len(df)}")
+
+# Crear pestañas para cada fecha
+tabs = st.tabs(fechas_str)
 
 # Iterar sobre cada pestaña
-for i, publicador in enumerate(publicadores):
+for i, (fecha, fecha_str) in enumerate(zip(fechas, fechas_str)):
     with tabs[i]:
-        # Filtrar datos del publicador
-        df_publicador = df[df['publicador'] == publicador].copy()
+        # Filtrar datos de la fecha
+        df_fecha = df[df['date'] == fecha].copy()
         
-        # Agrupar por fecha y contar registros
-        resumen = df_publicador.groupby('date').agg(
+        # Agrupar por publicador
+        resumen = df_fecha.groupby('publicador').agg(
             cantidad_registros=('key', 'count'),
             duracion_promedio=('duration', 'mean'),
             duracion_total=('duration', 'sum')
         ).reset_index()
         
-        # Formatear la fecha para mejor visualización
-        resumen['date'] = resumen['date'].dt.strftime('%Y-%m-%d')
+        # Formatear valores numéricos
         resumen['duracion_promedio'] = resumen['duracion_promedio'].round(2)
         resumen['duracion_total'] = resumen['duracion_total'].round(2)
         
-        # Renombrar columnas para mejor presentación
-        resumen.columns = ['Fecha', 'Cantidad de Registros', 'Duración Promedio (min)', 'Duración Total (min)']
+        # Renombrar columnas
+        resumen.columns = ['Publicador', 'Cantidad de Registros', 'Duración Promedio (min)', 'Duración Total (min)']
         
-        # Mostrar información del publicador
-        st.subheader(f"📋 {publicador}")
+        # Mostrar información de la fecha
+        st.subheader(f"📅 {fecha_str}")
         
-        # Métricas generales
+        # Métricas generales del día
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Total de Registros", len(df_publicador))
+            st.metric("Total de Registros", len(df_fecha))
         with col2:
-            st.metric("Días Activos", len(resumen))
+            st.metric("Publicadores Activos", len(resumen))
         with col3:
-            st.metric("Promedio por Día", f"{len(df_publicador)/len(resumen):.1f}")
+            st.metric("Promedio por Publicador", f"{len(df_fecha)/len(resumen):.1f}")
         with col4:
-            st.metric("Duración Total", f"{df_publicador['duration'].sum():.1f} min")
+            st.metric("Duración Total", f"{df_fecha['duration'].sum():.1f} min")
         
         st.markdown("---")
         
-        # Mostrar tabla
+        # Mostrar tabla ordenada por cantidad de registros
         st.dataframe(
-            resumen,
+            resumen.sort_values('Cantidad de Registros', ascending=False),
             use_container_width=True,
             hide_index=True,
             column_config={
-                "Fecha": st.column_config.TextColumn("Fecha", width="medium"),
+                "Publicador": st.column_config.TextColumn("Publicador", width="medium"),
                 "Cantidad de Registros": st.column_config.NumberColumn("Cantidad de Registros", width="medium"),
                 "Duración Promedio (min)": st.column_config.NumberColumn("Duración Promedio (min)", format="%.2f"),
                 "Duración Total (min)": st.column_config.NumberColumn("Duración Total (min)", format="%.2f")
             }
         )
         
-        # Gráfico de barras
-        st.bar_chart(resumen.set_index('Fecha')['Cantidad de Registros'])
+        # Gráfico de barras por publicador
+        st.bar_chart(resumen.set_index('Publicador')['Cantidad de Registros'])
 
 # Agregar sección de resumen general al final
 st.markdown("---")
-st.subheader("📈 Resumen General")
+st.subheader("📈 Resumen General por Publicador")
 
-resumen_general = df.groupby(['publicador']).agg(
+resumen_general = df.groupby('publicador').agg(
     total_registros=('key', 'count'),
     dias_activos=('date', 'nunique'),
     duracion_total=('duration', 'sum')
