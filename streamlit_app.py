@@ -75,21 +75,13 @@ for i, monitor in enumerate(monitores):
         
         resumen_publicador = df_monitor.groupby('publicador').agg(
             total_registros=('key', 'count'),
-            dias_activos=('date', 'nunique'),
-            duracion_promedio=('duration', 'mean'),
-            duracion_total=('duration', 'sum'),
-            distritos_unicos=('DISTRITO', 'nunique'),
-            provincias_unicas=('PROVINCIA', 'nunique')
+            dias_activos=('date', 'nunique')
         ).reset_index()
         
         resumen_publicador['promedio_por_dia'] = (resumen_publicador['total_registros'] / resumen_publicador['dias_activos']).round(1)
-        resumen_publicador['duracion_promedio'] = resumen_publicador['duracion_promedio'].round(2)
-        resumen_publicador['duracion_total'] = resumen_publicador['duracion_total'].round(2)
         
         resumen_publicador.columns = [
-            'Publicador', 'Total Registros', 'Días Activos', 
-            'Duración Promedio (min)', 'Duración Total (min)', 
-            'Distritos', 'Provincias', 'Promedio por Día'
+            'Publicador', 'Total Registros', 'Días Activos', 'Promedio por Día'
         ]
         
         # Ordenar por total de registros
