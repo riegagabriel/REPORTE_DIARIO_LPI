@@ -95,24 +95,15 @@ for i, monitor in enumerate(monitores):
                 "Publicador": st.column_config.TextColumn("Publicador", width="medium"),
                 "Total Registros": st.column_config.NumberColumn("Total Registros", help="Total de registros realizados"),
                 "Días Activos": st.column_config.NumberColumn("Días Activos", help="Días en los que realizó registros"),
-                "Promedio por Día": st.column_config.NumberColumn("Prom/Día", format="%.1f", help="Promedio de registros por día activo"),
-                "Distritos": st.column_config.NumberColumn("Distritos", help="Distritos únicos visitados"),
-                "Provincias": st.column_config.NumberColumn("Provincias", help="Provincias únicas visitadas")
+                "Promedio por Día": st.column_config.NumberColumn("Prom/Día", format="%.1f", help="Promedio de registros por día activo")
             }
         )
         
         st.markdown("---")
         
-        # GRÁFICOS DE DESEMPEÑO
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("### 📊 Total de Registros por Publicador")
-            st.bar_chart(resumen_publicador.set_index('Publicador')['Total Registros'])
-        
-        with col2:
-            st.markdown("### 📍 Cobertura Geográfica")
-            st.bar_chart(resumen_publicador.set_index('Publicador')['Distritos'])
+        # GRÁFICO DE DESEMPEÑO
+        st.markdown("### 📊 Total de Registros por Publicador")
+        st.bar_chart(resumen_publicador.set_index('Publicador')['Total Registros'])
         
         st.markdown("---")
         
