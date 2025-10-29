@@ -4,6 +4,7 @@ import pandas as pd
 st.set_page_config(page_title="Registros por Fecha", layout="wide")
 st.title("📊 Registros por Fecha y Publicador")
 
+# Cargar datos
 df = pd.read_stata('6_clean_encuesta_apertura_duplicados.dta')
 
 # Asegurar que date sea datetime
@@ -36,7 +37,7 @@ for i, (fecha, fecha_str) in enumerate(zip(fechas, fechas_str)):
         resumen['duracion_total'] = resumen['duracion_total'].round(2)
         
         # Renombrar columnas
-        resumen.columns = ['Publicador', 'Cantidad de Registros']
+        resumen.columns = ['Publicador', 'Cantidad de Registros', 'Duración Promedio (min)', 'Duración Total (min)']
         
         # Mostrar información de la fecha
         st.subheader(f"📅 {fecha_str}")
