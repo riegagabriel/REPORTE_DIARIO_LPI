@@ -4,22 +4,7 @@ import pandas as pd
 st.set_page_config(page_title="Registros por Fecha", layout="wide")
 st.title("📊 Registros por Fecha y Publicador")
 
-# Función para cargar datos
-def load_data(file_path):
-    return pd.read_stata(file_path)
-
-# Intentar cargar el archivo
-try:
-    df = load_data('6_clean_encuesta_apertura_duplicados.dta')
-    st.success("✅ Archivo cargado exitosamente")
-
-# Verificar que el dataframe tenga las columnas necesarias
-required_columns = ['publicador', 'date', 'key', 'duration']
-missing_columns = [col for col in required_columns if col not in df.columns]
-
-if missing_columns:
-    st.error(f"Faltan columnas requeridas: {', '.join(missing_columns)}")
-    st.stop()
+df = pd.read_stata('6_clean_encuesta_apertura_duplicados.dta')
 
 # Asegurar que date sea datetime
 df['date'] = pd.to_datetime(df['date'])
