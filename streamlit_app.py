@@ -7,22 +7,59 @@ st.set_page_config(page_title="Registros por Publicador", layout="wide")
 # Título principal
 st.title("📊 Registros por Publicador y Día")
 
-# Cargar el dataframe (asume que ya lo tienes cargado como 'df')
-df = pd.read_stata('6_clean_encuesta_apertura_duplicado.dta')  # Descomenta y ajusta según tu caso
+# Función para cargar datos
+@st.cache_data
+def load_data(file_path):
+    """Carga el archivo .dta"""
+    df = pd.read_stata(file_path)
+    df['date'] = pd.to_datetime(df['date'])
+    return df
 
-# Para este ejemplo, asumimos que el dataframe está disponible como 'df'
-# Asegurarse de que 'date' sea datetime
-if 'df' in st.session_state:
-    df = st.session_state.df
-else:
-    st.warning("Por favor, carga tu dataframe en st.session_state.df")
+# Intentar cargar el archivo
+try:
+    df = load_data('6_clean_encuesta_apertura_duplicado.dta')
+    st.success("✅ Archivo cargado exitosamente")
+except FileNotFoundError:
+    st.warning("⚠️ No se encontró el archivo '6_clean_encuesta_apertura_duplicado.dta'")
+    st.info("Por favor, sube el archivo .dta o .csv")
+    
+    uploaded_file = st.file_uploader(
+        "Selecciona el archivo de datos", 
+        type=['dta', 'csv', 'xlsx']
+    )
+    
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.endswith('.dta'):
+                df = pd.read_stata(uploaded_file)
+            elif uploaded_file.name.endswith('.csv'):
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
+            
+            df['date'] = pd.to_datetime(df['date'])
+            st.success("✅ Archivo cargado exitosamente")
+        except Exception as e:
+            st.error(f"Error al cargar el archivo: {str(e)}")
+            st.stop()
+    else:
+        st.stop()
+except Exception as e:
+    st.error(f"Error inesperado al cargar el archivo: {str(e)}")
     st.stop()
 
-# Convertir date a datetime si no lo está
-df['date'] = pd.to_datetime(df['date'])
+# Verificar que el dataframe tenga las columnas necesarias
+required_columns = ['publicador', 'date', 'key', 'duration']
+missing_columns = [col for col in required_columns if col not in df.columns]
+
+if missing_columns:
+    st.error(f"Faltan columnas requeridas: {', '.join(missing_columns)}")
+    st.stop()
 
 # Obtener lista única de publicadores ordenada
 publicadores = sorted(df['publicador'].unique())
+
+st.info(f"📊 Total de publicadores: {len(publicadores)} | Total de registros: {len(df)}")
 
 # Crear pestañas para cada publicador
 tabs = st.tabs(publicadores)
