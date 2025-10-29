@@ -1,10 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# Configuración de la página
 st.set_page_config(page_title="Registros por Fecha", layout="wide")
-
-# Título principal
 st.title("📊 Registros por Fecha y Publicador")
 
 # Función para cargar datos
@@ -15,34 +12,6 @@ def load_data(file_path):
 try:
     df = load_data('6_clean_encuesta_apertura_duplicados.dta')
     st.success("✅ Archivo cargado exitosamente")
-except FileNotFoundError:
-    st.warning("⚠️ No se encontró el archivo '6_clean_encuesta_apertura_duplicados.dta'")
-    st.info("Por favor, sube el archivo .dta o .csv")
-    
-    uploaded_file = st.file_uploader(
-        "Selecciona el archivo de datos", 
-        type=['dta', 'csv', 'xlsx']
-    )
-    
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.endswith('.dta'):
-                df = pd.read_stata(uploaded_file)
-            elif uploaded_file.name.endswith('.csv'):
-                df = pd.read_csv(uploaded_file)
-            else:
-                df = pd.read_excel(uploaded_file)
-            
-            df['date'] = pd.to_datetime(df['date'])
-            st.success("✅ Archivo cargado exitosamente")
-        except Exception as e:
-            st.error(f"Error al cargar el archivo: {str(e)}")
-            st.stop()
-    else:
-        st.stop()
-except Exception as e:
-    st.error(f"Error inesperado al cargar el archivo: {str(e)}")
-    st.stop()
 
 # Verificar que el dataframe tenga las columnas necesarias
 required_columns = ['publicador', 'date', 'key', 'duration']
