@@ -1,17 +1,17 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Seguimiento de Publicadores", layout="wide")
-st.title("📊 Seguimiento de Publicadores por Monitor")
+st.set_page_config(page_title="Seguimiento Censo - Publicadores", layout="wide")
+st.title("📊 Seguimiento de Censo por Monitor")
 
 # Cargar datos
-df = pd.read_excel('dashboard_lpi.xlsx')
+df = pd.read_excel('dashboard_censo.xlsx')
 
 # Asegurar que date sea datetime
 df['date'] = pd.to_datetime(df['date'])
 
 # Información general
-st.info(f"📅 Total de fechas: {df['date'].nunique()} | Total de monitores: {df['Monitor'].nunique()} | Total de publicadores: {df['publicador'].nunique()} | Total de registros: {len(df)}")
+st.info(f"📅 Total de fechas: {df['date'].nunique()} | Total de monitores: {df['Monitor'].nunique()} | Total de publicadores: {df['publicador'].nunique()} | Total de registros: {len(df)} | Total censados: {df['numero_total'].sum()}")
 
 # Obtener lista única de monitores ordenados
 monitores = sorted(df['Monitor'].unique())
@@ -26,7 +26,7 @@ for i, monitor in enumerate(monitores):
         df_monitor = df[df['Monitor'] == monitor].copy()
         
         st.subheader(f"👤 Monitor: {monitor}")
-        st.caption(f"Supervisa a {df_monitor['publicador'].nunique()} publicadores")
+        st.caption(f"Supervisa a {df_monitor['publicador'].nunique()} publicadores | Total censados: {df_monitor['numero_total'].sum()}")
         
         st.markdown("---")
         
@@ -43,11 +43,17 @@ for i, monitor in enumerate(monitores):
             values='registros'
         ).fillna(0).astype(int)
         
-        # Agregar columna de total
-        tabla_pivot['TOTAL'] = tabla_pivot.sum(axis=1)
+        # Agregar columna de total de registros
+        tabla_pivot['TOTAL REGISTROS'] = tabla_pivot.sum(axis=1)
         
-        # Ordenar por total descendente
-        tabla_pivot = tabla_pivot.sort_values('TOTAL', ascending=False)
+        # Calcular suma de numero_total por publicador
+        suma_censados = df_monitor.groupby('publicador')['numero_total'].sum()
+        
+        # Agregar columna de numero_total
+        tabla_pivot['NÚMERO TOTAL'] = suma_censados
+        
+        # Ordenar por numero total descendente
+        tabla_pivot = tabla_pivot.sort_values('NÚMERO TOTAL', ascending=False)
         
         # Formatear nombres de columnas (fechas)
         tabla_pivot.columns = [col.strftime('%d/%m') if isinstance(col, pd.Timestamp) else col for col in tabla_pivot.columns]
@@ -63,7 +69,8 @@ for i, monitor in enumerate(monitores):
             hide_index=True,
             column_config={
                 "publicador": st.column_config.TextColumn("Publicador", width="large"),
-                "TOTAL": st.column_config.NumberColumn("TOTAL", width="small", help="Total de registros del publicador")
+                "TOTAL REGISTROS": st.column_config.NumberColumn("TOTAL REGISTROS", width="small", help="Total de registros realizados"),
+                "TOTAL CENSADOS": st.column_config.NumberColumn("TOTAL CENSADOS", width="small", help="Total de personas censadas")
             },
             height=600
         )
