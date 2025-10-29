@@ -7,14 +7,6 @@ st.set_page_config(page_title="Registros por Publicador", layout="wide")
 # Título principal
 st.title("📊 Registros por Publicador y Día")
 
-# Función para cargar datos
-@st.cache_data
-def load_data(file_path):
-    """Carga el archivo .dta"""
-    df = pd.read_stata(file_path)
-    df['date'] = pd.to_datetime(df['date'])
-    return df
-
 # Intentar cargar el archivo
 try:
     df = load_data('6_clean_encuesta_apertura_duplicados.dta')
