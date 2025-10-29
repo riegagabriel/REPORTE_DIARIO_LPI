@@ -17,7 +17,7 @@ def load_data(file_path):
 
 # Intentar cargar el archivo
 try:
-    df = load_data('6_clean_encuesta_apertura_duplicado.dta')
+    df = load_data('6_clean_encuesta_apertura_duplicados.dta')
     st.success("✅ Archivo cargado exitosamente")
 except FileNotFoundError:
     st.warning("⚠️ No se encontró el archivo '6_clean_encuesta_apertura_duplicado.dta'")
