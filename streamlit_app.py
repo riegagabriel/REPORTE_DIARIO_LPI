@@ -5,7 +5,7 @@ st.set_page_config(page_title="Seguimiento Censo - Publicadores", layout="wide")
 st.title("📊 Seguimiento de Censo por Monitor")
 
 # Cargar datos
-df = pd.read_excel('dashboard_censo.xlsx')
+df = pd.read_excel('dashboard_lpi_reporte_diario.xlsx')
 
 # Asegurar que date sea datetime
 df['date'] = pd.to_datetime(df['date'])
