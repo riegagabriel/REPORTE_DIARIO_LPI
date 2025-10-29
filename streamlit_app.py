@@ -36,7 +36,7 @@ for i, (fecha, fecha_str) in enumerate(zip(fechas, fechas_str)):
         resumen['duracion_total'] = resumen['duracion_total'].round(2)
         
         # Renombrar columnas
-        resumen.columns = ['Publicador', 'Cantidad de Registros', 'Duración Promedio (min)', 'Duración Total (min)']
+        resumen.columns = ['Publicador', 'Cantidad de Registros']
         
         # Mostrar información de la fecha
         st.subheader(f"📅 {fecha_str}")
