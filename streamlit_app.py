@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 st.set_page_config(page_title="Seguimiento Operativo - Todos los Formatos", layout="wide")
-st.title("📊 Seguimiento Operativo por Formato y Monitor")
+st.title("📊 Seguimiento por encuesta y equipo monitor")
 
 # Cargar todos los DataFrames desde Excel
 @st.cache_data
@@ -17,19 +17,19 @@ def load_data():
         dataframes['📋 Reporte Diario'] = pd.DataFrame()
     
     try:
-        dataframes['📝 Reclamos'] = pd.read_excel('merged_reclamo.xlsx')
+        dataframes['📝 Encuesta -Formato de Reclamos-'] = pd.read_excel('merged_reclamo.xlsx')
     except FileNotFoundError:
         st.warning("⚠️ No se encontró: merged_reclamo.xlsx")
         dataframes['📝 Reclamos'] = pd.DataFrame()
     
     try:
-        dataframes['❌ Tachas'] = pd.read_excel('merged_tacha.xlsx')
+        dataframes['❌ Formato de eliminación o tachas'] = pd.read_excel('merged_tacha.xlsx')
     except FileNotFoundError:
         st.warning("⚠️ No se encontró: merged_tacha.xlsx")
         dataframes['❌ Tachas'] = pd.DataFrame()
     
     try:
-        dataframes['📑 Razones Tacha'] = pd.read_excel('merged_razones_tacha.xlsx')
+        dataframes['📑 Formato de razones -reclamo o tacha-'] = pd.read_excel('merged_razones_tacha.xlsx')
     except FileNotFoundError:
         st.warning("⚠️ No se encontró: merged_razones_tacha.xlsx")
         dataframes['📑 Razones Tacha'] = pd.DataFrame()
@@ -41,19 +41,19 @@ def load_data():
         dataframes['🗳️ Encuesta Ciudadana'] = pd.DataFrame()
     
     try:
-        dataframes['🔓 Apertura'] = pd.read_excel('merged_apertura.xlsx')
+        dataframes['🔓 Cuestionario de Apertura'] = pd.read_excel('merged_apertura.xlsx')
     except FileNotFoundError:
         st.warning("⚠️ No se encontró: merged_apertura.xlsx")
         dataframes['🔓 Apertura'] = pd.DataFrame()
     
     try:
-        dataframes['🔒 Cierre'] = pd.read_excel('merged_cierre.xlsx')
+        dataframes['🔒 Cuestionario de Cierre'] = pd.read_excel('merged_cierre.xlsx')
     except FileNotFoundError:
         st.warning("⚠️ No se encontró: merged_cierre.xlsx")
         dataframes['🔒 Cierre'] = pd.DataFrame()
     
     try:
-        dataframes['⚰️ Defunción'] = pd.read_excel('merged_defuncion.xlsx')
+        dataframes['⚰️Formato Acta de Defunción'] = pd.read_excel('merged_defuncion.xlsx')
     except FileNotFoundError:
         st.warning("⚠️ No se encontró: merged_defuncion.xlsx")
         dataframes['⚰️ Defunción'] = pd.DataFrame()
